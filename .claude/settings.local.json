@@ -4,7 +4,8 @@
       "Bash(open:*)",
       "Bash(gh api:*)",
       "Bash(node:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(gzip -c dist/medref.htm)"
     ]
   }
 }

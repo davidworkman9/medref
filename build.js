@@ -1,6 +1,7 @@
 const fs = require('fs');
 const diagnoses = JSON.parse(fs.readFileSync('./src/diagnoses.json', 'utf8'));
 const htmlShell = fs.readFileSync('./medref.htm', 'utf8');
+const embeddings = JSON.parse(fs.readFileSync('./src/embeddings.json', 'utf8'));
 
 // Build category list from diagnoses
 const catSet = new Map();
@@ -50,6 +51,9 @@ const appJS = `
 // ─── BUILT-IN DATA ───
 const BUILTIN_DIAGNOSES = ${JSON.stringify(dxData)};
 const BUILTIN_CATEGORIES = ${JSON.stringify(categories)};
+
+// ─── PRE-COMPUTED EMBEDDINGS ───
+const PRECOMPUTED_EMB = ${JSON.stringify(embeddings)};
 
 // ─── CONSTANTS ───
 const COLORS = ['#f97316','#06b6d4','#a855f7','#22c55e','#f43f5e','#eab308','#3b82f6','#ec4899','#14b8a6','#f59e0b'];
@@ -298,30 +302,37 @@ function updateModelDot(mode, status) {
   dot.className = 'mode-dot ' + (status === 'ready' ? 'green' : status === 'loading' ? 'yellow' : 'off');
 }
 
+function loadPrecomputedEmbeddings(mode) {
+  const ms = modelState[mode];
+  const precompKey = mode === 'ai' ? 'general' : 'med';
+  const precomp = PRECOMPUTED_EMB[precompKey] || {};
+  for (const [id, vec] of Object.entries(precomp)) {
+    ms.embeddings.set(id, new Float32Array(vec));
+  }
+}
+
 async function initModel(mode) {
   const ms = modelState[mode];
   if (ms.ready) return;
+  if (ms._loading) return; // prevent double init
+  ms._loading = true;
 
   const modelName = MODELS[mode].name;
   updateModelDot(mode, 'loading');
 
-  // Update badge
   const badge = document.getElementById('ai-badge');
   badge.className = 'loading';
   badge.textContent = MODELS[mode].label + ' loading...';
+
+  // Load pre-computed embeddings immediately (instant)
+  loadPrecomputedEmbeddings(mode);
 
   try {
     const pipeline = await loadTransformers();
     ms.extractor = await pipeline('feature-extraction', modelName, { dtype: 'q8' });
 
-    // Load cached embeddings
-    const stored = await getAllEmbeddings(ms.dbStore);
-    stored.forEach(e => { ms.embeddings.set(e.id, new Float32Array(e.embedding)); });
-
-    // Embed missing diagnoses
+    // Embed any user-added diagnoses not in pre-computed set
     const d = getData();
-    let newCount = 0;
-    const total = d.diagnoses.length;
     for (const dx of d.diagnoses) {
       if (!ms.embeddings.has(dx.id)) {
         const text = dxSearchText(dx);
@@ -329,14 +340,11 @@ async function initModel(mode) {
         const emb = new Float32Array(output.data);
         ms.embeddings.set(dx.id, emb);
         await putEmbedding(ms.dbStore, dx.id, emb);
-        newCount++;
-        if (newCount % 5 === 0) {
-          badge.textContent = MODELS[mode].label + ' ' + Math.round(((total - (total - newCount)) / total) * 100) + '%';
-        }
       }
     }
 
     ms.ready = true;
+    ms._loading = false;
     updateModelDot(mode, 'ready');
     badge.className = 'ready';
     badge.textContent = MODELS[mode].label + ' ✓';
@@ -352,6 +360,7 @@ async function initModel(mode) {
 
   } catch (err) {
     console.error(MODELS[mode].label + ' failed to load:', err);
+    ms._loading = false;
     updateModelDot(mode, 'off');
     badge.className = 'off';
     badge.textContent = '';
@@ -392,8 +401,11 @@ function setSearchMode(mode) {
       badge.className = 'ready';
       badge.textContent = MODELS[mode].label;
     } else {
-      badge.className = 'off';
-      initModel(mode); // start loading
+      // Pre-load embeddings instantly so they're ready when model arrives
+      if (ms.embeddings.size === 0) loadPrecomputedEmbeddings(mode);
+      badge.className = 'loading';
+      badge.textContent = MODELS[mode].label + '...';
+      initModel(mode);
     }
   }
 
