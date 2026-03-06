@@ -195,8 +195,8 @@ async function initSemanticSearch() {
     badge.textContent = 'AI ✓';
     setTimeout(() => { badge.textContent = 'AI'; }, 2000);
 
-    // If there's a pending search, re-run it
-    if (state.search) renderList();
+    // If there's a pending search and detail view is not open, re-run it
+    if (state.search && !state.viewingId) renderList();
 
   } catch (err) {
     console.error('Semantic search failed to load:', err);
@@ -569,7 +569,7 @@ function setupSearch() {
       state.searchTimeout = setTimeout(async () => {
         const d = getData();
         const results = await semanticSearch(state.search, d.diagnoses);
-        if (results && state.search === e.target.value.trim()) {
+        if (results && state.search === e.target.value.trim() && !state.viewingId) {
           state.semanticResults = results;
           renderList();
         }
@@ -618,11 +618,11 @@ function escHtml(s) {
 // ─── SERVICE WORKER ───
 if ('serviceWorker' in navigator) {
   const swCode = \`
-const CACHE = 'medref-v2';
+const CACHE = 'medref-v3';
 const ASSETS = [location.href];
-self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS))); self.skipWaiting(); });
-self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))); self.clients.claim(); });
-self.addEventListener('fetch', e => { e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match(e.request)))); });
+self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS))); });
+self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))); });
+self.addEventListener('fetch', e => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });
 \`;
   const blob = new Blob([swCode], { type: 'application/javascript' });
   navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});

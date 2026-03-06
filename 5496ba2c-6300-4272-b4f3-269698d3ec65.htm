@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MedRef">
+<meta name="theme-color" content="#0f172a">
+<title>MedRef</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #273449;
+    --border: #334155;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --accent1: #f97316; /* orange */
+    --accent2: #06b6d4; /* cyan */
+    --accent3: #a855f7; /* purple */
+    --accent4: #22c55e; /* green */
+    --accent5: #f43f5e; /* rose */
+    --accent6: #eab308; /* yellow */
+    --radius: 16px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* ── APP SHELL ── */
+  #app { display: flex; flex-direction: column; height: 100dvh; }
+
+  /* ── HEADER ── */
+  #header {
+    background: var(--bg);
+    padding: calc(var(--safe-top) + 12px) 16px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    position: sticky; top: 0; z-index: 50;
+  }
+  #header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  #logo { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+  #logo span:nth-child(1) { color: var(--accent2); }
+  #logo span:nth-child(2) { color: var(--text); }
+  #logo span:nth-child(3) { color: var(--accent1); }
+
+  #add-btn {
+    background: var(--accent1);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+  }
+  #add-btn:active { opacity: 0.8; transform: scale(0.97); }
+
+  /* Search */
+  #search-wrap { position: relative; }
+  #search {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 11px 14px 11px 40px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  #search:focus { border-color: var(--accent2); }
+  #search::placeholder { color: var(--muted); }
+  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+
+  /* ── TABS ── */
+  #tabs {
+    display: flex;
+    padding: 10px 16px 0;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex-shrink: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  #tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    padding: 8px 16px;
+    border-radius: 10px 10px 0 0;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+    padding-bottom: 10px;
+  }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent2); }
+  .tab:active { opacity: 0.7; }
+
+  /* ── MAIN CONTENT ── */
+  #main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    padding-bottom: calc(var(--safe-bottom) + 80px);
+  }
+
+  /* ── CATEGORY PILLS ── */
+  #category-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-bottom: 16px;
+    padding-bottom: 4px;
+  }
+  #category-bar::-webkit-scrollbar { display: none; }
+  .cat-pill {
+    padding: 6px 14px;
+    border-radius: 50px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .cat-pill.active, .cat-pill:active { color: #fff; }
+
+  /* ── DIAGNOSIS CARDS ── */
+  .section-letter {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--accent2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 0 6px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
+    margin-top: 6px;
+  }
+
+  .dx-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+    overflow: hidden;
+  }
+  .dx-card:active { transform: scale(0.98); }
+
+  .dx-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .dx-color-bar {
+    width: 4px;
+    height: 44px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .dx-card-info { flex: 1; min-width: 0; }
+  .dx-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dx-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .dx-icd {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 50px;
+    font-family: 'DM Sans', monospace;
+  }
+  .dx-cat-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 50px;
+    color: #fff;
+  }
+
+  .dx-card-chevron { color: var(--muted); font-size: 18px; }
+
+  /* ── DETAIL VIEW ── */
+  #detail-view {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+  }
+  #detail-view.open { display: flex; }
+
+  #detail-header {
+    padding: calc(var(--safe-top) + 12px) 16px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  #detail-back {
+    background: none;
+    border: none;
+    color: var(--accent2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  #detail-title-bar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  #detail-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.2;
+    flex: 1;
+  }
+  #detail-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .icon-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 17px;
+  }
+  .icon-btn:active { opacity: 0.7; }
+  .icon-btn.delete { color: var(--accent5); }
+
+  #detail-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    padding-bottom: calc(var(--safe-bottom) + 20px);
+  }
+
+  .detail-meta-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+
+  .section-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+
+  .section-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .section-content {
+    padding: 14px;
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+
+  .section-content ul { list-style: none; }
+  .section-content ul li { padding: 4px 0; display: flex; align-items: flex-start; gap: 8px; }
+  .section-content ul li::before { content: '▸'; color: var(--accent2); flex-shrink: 0; margin-top: 1px; }
+
+  .tag-list { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; }
+  .tag {
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  /* ── MODAL ── */
+  #modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: none;
+    align-items: flex-end;
+  }
+  #modal-overlay.open { display: flex; }
+
+  #modal {
+    background: var(--surface);
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    max-height: 92dvh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: var(--safe-bottom);
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  #modal-header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  #modal-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; }
+  #modal-close {
+    background: var(--surface2);
+    border: none;
+    border-radius: 50%;
+    width: 32px; height: 32px;
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  #modal-body { flex: 1; overflow-y: auto; padding: 20px; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+  }
+  .form-input, .form-textarea, .form-select {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--accent2); }
+  .form-textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+  .form-hint { font-size: 12px; color: var(--muted); margin-top: 5px; }
+
+  .color-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+  .color-swatch {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .color-swatch.selected { border-color: #fff; transform: scale(1.1); }
+
+  #modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .btn-primary {
+    flex: 1;
+    background: var(--accent1);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-primary:active { opacity: 0.8; }
+  .btn-cancel {
+    background: var(--surface2);
+    color: var(--muted);
+    border: none;
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  /* Category manager */
+  #cat-manager {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 150;
+    display: none;
+    flex-direction: column;
+  }
+  #cat-manager.open { display: flex; }
+  #cat-manager-header {
+    padding: calc(var(--safe-top) + 12px) 16px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  #cat-manager-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; }
+  #cat-manager-body { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: calc(var(--safe-bottom) + 20px); }
+  .cat-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    border: 1.5px solid var(--border);
+  }
+  .cat-item-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .cat-item-name { flex: 1; font-weight: 600; font-size: 16px; }
+  .cat-delete-btn { background: none; border: none; color: var(--accent5); font-size: 20px; cursor: pointer; padding: 4px; }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .empty-state-sub { font-size: 15px; line-height: 1.6; }
+
+  /* Install banner */
+  #install-banner {
+    position: fixed;
+    bottom: calc(var(--safe-bottom) + 16px);
+    left: 16px;
+    right: 16px;
+    background: var(--accent2);
+    color: var(--bg);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 300;
+    box-shadow: 0 8px 32px rgba(6,182,212,0.4);
+    animation: fadeInUp 0.4s ease;
+  }
+  @keyframes fadeInUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  #install-banner.hidden { display: none; }
+  #install-banner-text { flex: 1; font-size: 13px; font-weight: 600; line-height: 1.4; }
+  #install-dismiss { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--bg); padding: 4px; }
+
+  .count-badge {
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 50px;
+    margin-left: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- INSTALL BANNER -->
+<div id="install-banner">
+  <span style="font-size:22px">📲</span>
+  <div id="install-banner-text">Tap <strong>Share → Add to Home Screen</strong> to install MedRef as an app!</div>
+  <button id="install-dismiss" onclick="dismissBanner()">✕</button>
+</div>
+
+<!-- APP SHELL -->
+<div id="app">
+
+  <!-- HEADER -->
+  <div id="header">
+    <div id="header-top">
+      <div id="logo"><span>Med</span><span>Ref</span><span>+</span></div>
+      <button id="add-btn" onclick="openModal()">＋ Add Dx</button>
+    </div>
+    <div id="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input id="search" type="search" placeholder="Search diagnoses..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div id="tabs">
+    <button class="tab active" data-tab="browse" onclick="switchTab('browse')">Browse A–Z</button>
+    <button class="tab" data-tab="category" onclick="switchTab('category')">By Category</button>
+    <button class="tab" data-tab="recent" onclick="switchTab('recent')">Recent</button>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+    <div id="category-bar"></div>
+    <div id="dx-list"></div>
+  </div>
+
+</div>
+
+<!-- DETAIL VIEW -->
+<div id="detail-view">
+  <div id="detail-header">
+    <button id="detail-back" onclick="closeDetail()">← Back</button>
+    <div id="detail-title-bar">
+      <div id="detail-name"></div>
+      <div id="detail-actions">
+        <div class="icon-btn" onclick="editCurrentDx()" title="Edit">✏️</div>
+        <div class="icon-btn delete" onclick="deleteCurrentDx()" title="Delete">🗑</div>
+      </div>
+    </div>
+  </div>
+  <div id="detail-body"></div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div id="modal-overlay">
+  <div id="modal">
+    <div id="modal-header">
+      <div id="modal-title">New Diagnosis</div>
+      <button id="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body">
+      <div class="form-group">
+        <label class="form-label">Diagnosis Name *</label>
+        <input id="f-name" class="form-input" type="text" placeholder="e.g. Acute Appendicitis">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ICD-10 Code</label>
+        <input id="f-icd" class="form-input" type="text" placeholder="e.g. K35.89" style="font-family: monospace; font-size:15px;">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select id="f-cat" class="form-select"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Color Label</label>
+        <div class="color-row" id="color-row"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Signs & Symptoms</label>
+        <textarea id="f-signs" class="form-textarea" placeholder="List signs and symptoms, one per line or free text..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Treatment</label>
+        <textarea id="f-treatment" class="form-textarea" placeholder="Treatment protocols, interventions..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Medications / Dosing</label>
+        <textarea id="f-meds" class="form-textarea" placeholder="Drug names, doses, routes, frequencies..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Differential Diagnoses</label>
+        <input id="f-ddx" class="form-input" type="text" placeholder="e.g. Ectopic pregnancy, Ovarian torsion (comma separated)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Lab / Imaging Findings</label>
+        <textarea id="f-labs" class="form-textarea" placeholder="Key labs, imaging criteria, findings..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Clinical Pearls / Notes</label>
+        <textarea id="f-notes" class="form-textarea" placeholder="Teaching points, warnings, pearls..."></textarea>
+      </div>
+    </div>
+    <div id="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveDx()">Save Diagnosis</button>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY MANAGER -->
+<div id="cat-manager">
+  <div id="cat-manager-header">
+    <div id="cat-manager-title">Manage Categories</div>
+    <button class="icon-btn" onclick="closeCatManager()">✕</button>
+  </div>
+  <div id="cat-manager-body">
+    <div class="form-group" style="display:flex; gap:10px;">
+      <input id="new-cat-name" class="form-input" type="text" placeholder="New category name..." style="flex:1">
+      <div id="cat-color-pick" style="display:flex; gap:6px; align-items:center;"></div>
+    </div>
+    <button class="btn-primary" onclick="addCategory()" style="width:100%; margin-bottom:20px;">Add Category</button>
+    <div id="cat-list"></div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const COLORS = [
+  '#f97316','#06b6d4','#a855f7','#22c55e','#f43f5e',
+  '#eab308','#3b82f6','#ec4899','#14b8a6','#f59e0b'
+];
+
+const SECTION_COLORS = {
+  signs:     { bg: 'rgba(6,182,212,0.15)',   icon: '🩺', label: 'Signs & Symptoms' },
+  treatment: { bg: 'rgba(34,197,94,0.15)',   icon: '💊', label: 'Treatment' },
+  meds:      { bg: 'rgba(168,85,247,0.15)',  icon: '💉', label: 'Medications & Dosing' },
+  labs:      { bg: 'rgba(249,115,22,0.15)',  icon: '🔬', label: 'Lab / Imaging Findings' },
+  notes:     { bg: 'rgba(234,179,8,0.15)',   icon: '📌', label: 'Clinical Pearls' },
+};
+
+function loadData() {
+  try {
+    return JSON.parse(localStorage.getItem('medref_data') || '{}');
+  } catch { return {}; }
+}
+
+function saveData(data) {
+  localStorage.setItem('medref_data', JSON.stringify(data));
+}
+
+function getData() {
+  let d = loadData();
+  if (!d.diagnoses) d.diagnoses = [];
+  if (!d.categories) d.categories = [
+    { id: 'c1', name: 'Cardiology', color: '#f43f5e' },
+    { id: 'c2', name: 'Pulmonology', color: '#06b6d4' },
+    { id: 'c3', name: 'Neurology', color: '#a855f7' },
+    { id: 'c4', name: 'GI / Hepatology', color: '#f97316' },
+    { id: 'c5', name: 'Infectious Disease', color: '#22c55e' },
+    { id: 'c6', name: 'Endocrinology', color: '#eab308' },
+    { id: 'c7', name: 'Nephrology', color: '#3b82f6' },
+    { id: 'c8', name: 'Orthopedics', color: '#ec4899' },
+  ];
+  if (!d.recent) d.recent = [];
+  return d;
+}
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+let state = {
+  tab: 'browse',
+  catFilter: 'all',
+  search: '',
+  editingId: null,
+  selectedColor: COLORS[0],
+  catPickColor: COLORS[0],
+  viewingId: null,
+};
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // seed sample data if empty
+  let d = getData();
+  if (d.diagnoses.length === 0) {
+    d.diagnoses = [
+      {
+        id: uid(), name: 'Acute Myocardial Infarction', icd: 'I21.9',
+        catId: 'c1', color: '#f43f5e',
+        signs: 'Chest pain (crushing, pressure-like)\nRadiation to left arm, jaw, back\nDiaphoresis\nNausea/vomiting\nDyspnea\nFatigue\nSyncope (in some)',
+        treatment: '1. Activate cath lab (STEMI) — Door-to-balloon <90 min\n2. Aspirin 325mg PO STAT\n3. P2Y12 inhibitor (ticagrelor 180mg or clopidogrel 600mg)\n4. Anticoagulation: heparin or bivalirudin\n5. Oxygen if SpO2 <90%\n6. Nitrates (unless hypotensive or RV infarct)\n7. Beta-blocker if hemodynamically stable',
+        meds: 'Aspirin: 325mg PO x1, then 81mg daily\nTicagrelor: 180mg load, then 90mg BID\nMetoprolol: 25–50mg PO BID\nLisinopril: 2.5–10mg PO daily\nAtorvastatin: 80mg PO daily\nHeparin: 60 units/kg IV bolus (max 4000u)',
+        ddx: 'NSTEMI, Unstable Angina, Aortic Dissection, PE, Pericarditis, GERD, Musculoskeletal pain',
+        labs: 'Troponin I/T (serial q3–6h)\n12-lead ECG immediately\nCBC, BMP, coagulation panel\nChest X-ray\nEchocardiogram\nLipid panel',
+        notes: '⚠️ STEMI: ST elevation ≥1mm in ≥2 contiguous leads, or new LBBB\nRight-sided leads (V3R/V4R) for RV infarct — AVOID nitrates\nInferior MI: check for AV block\nFemales/diabetics: may present atypically',
+        created: Date.now(),
+      },
+      {
+        id: uid(), name: 'Community-Acquired Pneumonia', icd: 'J18.9',
+        catId: 'c5', color: '#22c55e',
+        signs: 'Fever/chills\nProductive cough (purulent sputum)\nDyspnea\nPleuritic chest pain\nTachycardia\nTachypnea\nDecreased breath sounds\nDullness to percussion\nEgophony',
+        treatment: '1. Risk stratify with PSI/PORT or CURB-65\n2. Outpatient: amoxicillin or azithromycin\n3. Inpatient (non-ICU): beta-lactam + macrolide or respiratory fluoroquinolone\n4. ICU: antipseudomonal beta-lactam + azithromycin or fluoroquinolone\n5. Supplemental O2 if SpO2 <94%\n6. IV fluids if dehydrated',
+        meds: 'Azithromycin: 500mg PO/IV day 1, then 250mg days 2–5\nAmoxicillin-clavulanate: 875/125mg PO BID\nLevofloxacin: 750mg PO/IV daily x5d\nCeftriaxone: 1–2g IV daily',
+        ddx: 'HCAP, Aspiration pneumonia, PE, CHF exacerbation, Lung abscess, TB',
+        labs: 'CXR (infiltrate confirmation)\nCBC with differential\nBMP\nBlood cultures (x2 before abx)\nSputum Gram stain and culture\nUrinary Legionella/Pneumococcal antigen\nProCalcitonin\nABG if severe',
+        notes: 'CURB-65: Confusion, Urea >7, RR ≥30, BP <90/60, Age ≥65\nScore 0–1: outpatient, 2: inpatient, ≥3: consider ICU\nAtypical organisms: Legionella, Mycoplasma, Chlamydophila\nHospital admission if SpO2 <90% on room air',
+        created: Date.now() - 1000,
+      },
+    ];
+    saveData(d);
+  }
+
+  buildColorRow();
+  buildCatPickRow();
+  render();
+  setupSearch();
+
+  // install banner
+  if (!localStorage.getItem('medref_banner_dismissed') && !isInstalled()) {
+    setTimeout(() => {
+      document.getElementById('install-banner').classList.remove('hidden');
+    }, 2000);
+  } else {
+    document.getElementById('install-banner').classList.add('hidden');
+  }
+});
+
+function isInstalled() {
+  return window.navigator.standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches;
+}
+
+function dismissBanner() {
+  localStorage.setItem('medref_banner_dismissed', '1');
+  document.getElementById('install-banner').classList.add('hidden');
+}
+
+function uid() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function render() {
+  renderCategoryBar();
+  renderList();
+}
+
+function renderCategoryBar() {
+  const d = getData();
+  const bar = document.getElementById('category-bar');
+  if (state.tab !== 'category') { bar.innerHTML = ''; return; }
+
+  let html = `<button class="cat-pill ${state.catFilter==='all'?'active':''}" 
+    style="${state.catFilter==='all'?'background:var(--accent2);border-color:var(--accent2);':''}"
+    onclick="setCatFilter('all')">All</button>`;
+
+  d.categories.forEach(cat => {
+    const active = state.catFilter === cat.id;
+    html += `<button class="cat-pill ${active?'active':''}" 
+      style="${active?`background:${cat.color};border-color:${cat.color};`:''}"
+      onclick="setCatFilter('${cat.id}')">${cat.name}</button>`;
+  });
+
+  html += `<button class="cat-pill" onclick="openCatManager()" style="border-style:dashed;">⚙ Manage</button>`;
+  bar.innerHTML = html;
+}
+
+function renderList() {
+  const d = getData();
+  const list = document.getElementById('dx-list');
+  let diagnoses = [...d.diagnoses];
+
+  // filter by search
+  if (state.search) {
+    const q = state.search.toLowerCase();
+    diagnoses = diagnoses.filter(dx =>
+      dx.name.toLowerCase().includes(q) ||
+      (dx.icd||'').toLowerCase().includes(q) ||
+      (dx.signs||'').toLowerCase().includes(q) ||
+      (dx.ddx||'').toLowerCase().includes(q)
+    );
+  }
+
+  // filter by category (if category tab)
+  if (state.tab === 'category' && state.catFilter !== 'all') {
+    diagnoses = diagnoses.filter(dx => dx.catId === state.catFilter);
+  }
+
+  // recent tab
+  if (state.tab === 'recent') {
+    const recent = d.recent || [];
+    const recentDx = recent
+      .map(id => diagnoses.find(dx => dx.id === id))
+      .filter(Boolean);
+    // remove dupes, keep order
+    diagnoses = recentDx;
+  }
+
+  if (diagnoses.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">🩻</div>
+      <div class="empty-state-title">${state.search ? 'No results found' : 'No diagnoses yet'}</div>
+      <div class="empty-state-sub">${state.search ? 'Try a different search term' : 'Tap <strong>+ Add Dx</strong> to add your first diagnosis'}</div>
+    </div>`;
+    return;
+  }
+
+  if (state.tab === 'recent') {
+    list.innerHTML = diagnoses.map(dx => dxCardHTML(dx, d)).join('');
+    return;
+  }
+
+  // Sort A-Z
+  diagnoses.sort((a, b) => a.name.localeCompare(b.name));
+
+  // Group by first letter
+  const groups = {};
+  diagnoses.forEach(dx => {
+    const letter = dx.name[0].toUpperCase();
+    if (!groups[letter]) groups[letter] = [];
+    groups[letter].push(dx);
+  });
+
+  let html = '';
+  Object.keys(groups).sort().forEach(letter => {
+    html += `<div class="section-letter">${letter}</div>`;
+    groups[letter].forEach(dx => { html += dxCardHTML(dx, d); });
+  });
+
+  list.innerHTML = html;
+}
+
+function dxCardHTML(dx, d) {
+  const cat = (d.categories || []).find(c => c.id === dx.catId);
+  const color = dx.color || '#06b6d4';
+  return `<div class="dx-card" onclick="openDetail('${dx.id}')">
+    <div class="dx-card-header">
+      <div class="dx-color-bar" style="background:${color}"></div>
+      <div class="dx-card-info">
+        <div class="dx-name">${escHtml(dx.name)}</div>
+        <div class="dx-meta">
+          ${dx.icd ? `<span class="dx-icd">${escHtml(dx.icd)}</span>` : ''}
+          ${cat ? `<span class="dx-cat-badge" style="background:${cat.color}22;color:${cat.color}">${escHtml(cat.name)}</span>` : ''}
+        </div>
+      </div>
+      <span class="dx-card-chevron">›</span>
+    </div>
+  </div>`;
+}
+
+// ─── DETAIL ───────────────────────────────────────────────────────────────────
+function openDetail(id) {
+  const d = getData();
+  const dx = d.diagnoses.find(x => x.id === id);
+  if (!dx) return;
+
+  state.viewingId = id;
+
+  // track recent
+  d.recent = d.recent || [];
+  d.recent = [id, ...d.recent.filter(r => r !== id)].slice(0, 20);
+  saveData(d);
+
+  const cat = (d.categories || []).find(c => c.id === dx.catId);
+  const color = dx.color || '#06b6d4';
+
+  document.getElementById('detail-name').textContent = dx.name;
+
+  let metaHTML = '';
+  if (dx.icd) metaHTML += `<span class="dx-icd" style="font-size:13px;">${escHtml(dx.icd)}</span>`;
+  if (cat) metaHTML += `<span class="dx-cat-badge" style="background:${cat.color}22;color:${cat.color};font-size:13px;">${escHtml(cat.name)}</span>`;
+
+  let bodyHTML = `<div class="detail-meta-row">${metaHTML}</div>`;
+
+  const sections = [
+    { key: 'signs',     text: dx.signs },
+    { key: 'treatment', text: dx.treatment },
+    { key: 'meds',      text: dx.meds },
+    { key: 'labs',      text: dx.labs },
+    { key: 'notes',     text: dx.notes },
+  ];
+
+  sections.forEach(({ key, text }) => {
+    if (!text) return;
+    const sec = SECTION_COLORS[key];
+    bodyHTML += `
+      <div class="section-card">
+        <div class="section-card-header" style="background:${sec.bg}">
+          <div class="section-icon" style="background:${sec.bg}">${sec.icon}</div>
+          <div class="section-title">${sec.label}</div>
+        </div>
+        <div class="section-content">${formatContent(text)}</div>
+      </div>`;
+  });
+
+  if (dx.ddx) {
+    const items = dx.ddx.split(',').map(s => s.trim()).filter(Boolean);
+    bodyHTML += `
+      <div class="section-card">
+        <div class="section-card-header" style="background:rgba(244,63,94,0.12)">
+          <div class="section-icon" style="background:rgba(244,63,94,0.12)">⚖️</div>
+          <div class="section-title">Differential Diagnoses</div>
+        </div>
+        <div class="tag-list">${items.map(i => `<span class="tag">${escHtml(i)}</span>`).join('')}</div>
+      </div>`;
+  }
+
+  const colorBar = `<div style="height:5px;background:${color};border-radius:0 0 0 0;margin-bottom:16px;border-radius:12px;"></div>`;
+
+  document.getElementById('detail-body').innerHTML = colorBar + bodyHTML;
+  document.getElementById('detail-view').classList.add('open');
+}
+
+function formatContent(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  if (lines.length > 1) {
+    return '<ul>' + lines.map(l => `<li>${escHtml(l)}</li>`).join('') + '</ul>';
+  }
+  return escHtml(text);
+}
+
+function closeDetail() {
+  state.viewingId = null;
+  document.getElementById('detail-view').classList.remove('open');
+  render();
+}
+
+function editCurrentDx() {
+  if (!state.viewingId) return;
+  openModal(state.viewingId);
+}
+
+function deleteCurrentDx() {
+  if (!state.viewingId) return;
+  if (!confirm('Delete this diagnosis?')) return;
+  const d = getData();
+  d.diagnoses = d.diagnoses.filter(x => x.id !== state.viewingId);
+  d.recent = (d.recent || []).filter(r => r !== state.viewingId);
+  saveData(d);
+  closeDetail();
+}
+
+// ─── MODAL ───────────────────────────────────────────────────────────────────
+function openModal(editId) {
+  state.editingId = editId || null;
+  const d = getData();
+
+  // populate category select
+  const sel = document.getElementById('f-cat');
+  sel.innerHTML = `<option value="">— No category —</option>` +
+    d.categories.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
+
+  if (editId) {
+    const dx = d.diagnoses.find(x => x.id === editId);
+    if (dx) {
+      document.getElementById('modal-title').textContent = 'Edit Diagnosis';
+      document.getElementById('f-name').value = dx.name || '';
+      document.getElementById('f-icd').value = dx.icd || '';
+      document.getElementById('f-cat').value = dx.catId || '';
+      document.getElementById('f-signs').value = dx.signs || '';
+      document.getElementById('f-treatment').value = dx.treatment || '';
+      document.getElementById('f-meds').value = dx.meds || '';
+      document.getElementById('f-ddx').value = dx.ddx || '';
+      document.getElementById('f-labs').value = dx.labs || '';
+      document.getElementById('f-notes').value = dx.notes || '';
+      state.selectedColor = dx.color || COLORS[0];
+    }
+  } else {
+    document.getElementById('modal-title').textContent = 'New Diagnosis';
+    ['f-name','f-icd','f-signs','f-treatment','f-meds','f-ddx','f-labs','f-notes'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    sel.value = '';
+    state.selectedColor = COLORS[0];
+  }
+
+  updateColorSwatches();
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('f-name').focus(), 300);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  state.editingId = null;
+}
+
+function saveDx() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('Diagnosis name is required.'); return; }
+
+  const d = getData();
+  const record = {
+    id: state.editingId || uid(),
+    name,
+    icd: document.getElementById('f-icd').value.trim(),
+    catId: document.getElementById('f-cat').value,
+    color: state.selectedColor,
+    signs: document.getElementById('f-signs').value.trim(),
+    treatment: document.getElementById('f-treatment').value.trim(),
+    meds: document.getElementById('f-meds').value.trim(),
+    ddx: document.getElementById('f-ddx').value.trim(),
+    labs: document.getElementById('f-labs').value.trim(),
+    notes: document.getElementById('f-notes').value.trim(),
+    created: state.editingId ? (d.diagnoses.find(x=>x.id===state.editingId)||{}).created || Date.now() : Date.now(),
+    updated: Date.now(),
+  };
+
+  if (state.editingId) {
+    d.diagnoses = d.diagnoses.map(x => x.id === state.editingId ? record : x);
+  } else {
+    d.diagnoses.push(record);
+  }
+
+  saveData(d);
+  closeModal();
+
+  // if editing, refresh detail
+  if (state.editingId) {
+    state.viewingId = record.id;
+    openDetail(record.id);
+  } else {
+    closeDetail();
+    render();
+  }
+}
+
+// ─── COLOR SWATCHES ──────────────────────────────────────────────────────────
+function buildColorRow() {
+  const row = document.getElementById('color-row');
+  row.innerHTML = COLORS.map(c =>
+    `<div class="color-swatch ${c===state.selectedColor?'selected':''}" 
+      style="background:${c}" onclick="selectColor('${c}')"></div>`
+  ).join('');
+}
+
+function updateColorSwatches() {
+  document.querySelectorAll('#color-row .color-swatch').forEach(el => {
+    el.classList.toggle('selected', el.style.background === hexToRgb(state.selectedColor) ||
+      el.style.background === state.selectedColor);
+  });
+}
+
+function selectColor(c) {
+  state.selectedColor = c;
+  document.querySelectorAll('#color-row .color-swatch').forEach(el => {
+    const elColor = el.style.background;
+    el.classList.toggle('selected', elColor === c || elColor === hexToRgb(c));
+  });
+}
+
+function hexToRgb(hex) {
+  // browsers may convert hex to rgb() in style
+  return hex; // comparison handled by classList logic
+}
+
+function buildCatPickRow() {
+  const row = document.getElementById('cat-color-pick');
+  row.innerHTML = COLORS.map(c =>
+    `<div class="color-swatch ${c===state.catPickColor?'selected':''}" 
+      style="background:${c};width:28px;height:28px;" onclick="selectCatColor('${c}')"></div>`
+  ).join('');
+}
+
+function selectCatColor(c) {
+  state.catPickColor = c;
+  document.querySelectorAll('#cat-color-pick .color-swatch').forEach(el => {
+    el.classList.toggle('selected', el.style.background === c);
+  });
+}
+
+// ─── TABS ────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  state.tab = tab;
+  state.catFilter = 'all';
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+  });
+  render();
+}
+
+function setCatFilter(id) {
+  state.catFilter = id;
+  renderCategoryBar();
+  renderList();
+}
+
+// ─── SEARCH ──────────────────────────────────────────────────────────────────
+function setupSearch() {
+  document.getElementById('search').addEventListener('input', e => {
+    state.search = e.target.value.trim();
+    renderList();
+  });
+}
+
+// ─── CATEGORY MANAGER ────────────────────────────────────────────────────────
+function openCatManager() {
+  renderCatManager();
+  document.getElementById('cat-manager').classList.add('open');
+}
+
+function closeCatManager() {
+  document.getElementById('cat-manager').classList.remove('open');
+  render();
+}
+
+function renderCatManager() {
+  const d = getData();
+  const list = document.getElementById('cat-list');
+  if (d.categories.length === 0) {
+    list.innerHTML = '<div class="empty-state" style="padding:30px 0"><div class="empty-state-sub">No categories yet.</div></div>';
+    return;
+  }
+  list.innerHTML = d.categories.map(cat => `
+    <div class="cat-item">
+      <div class="cat-item-dot" style="background:${cat.color}"></div>
+      <div class="cat-item-name">${escHtml(cat.name)}</div>
+      <button class="cat-delete-btn" onclick="deleteCategory('${cat.id}')">✕</button>
+    </div>
+  `).join('');
+}
+
+function addCategory() {
+  const name = document.getElementById('new-cat-name').value.trim();
+  if (!name) return;
+  const d = getData();
+  d.categories.push({ id: uid(), name, color: state.catPickColor });
+  saveData(d);
+  document.getElementById('new-cat-name').value = '';
+  renderCatManager();
+}
+
+function deleteCategory(id) {
+  if (!confirm('Delete this category? Diagnoses will not be deleted.')) return;
+  const d = getData();
+  d.categories = d.categories.filter(c => c.id !== id);
+  // unassign
+  d.diagnoses = d.diagnoses.map(dx => dx.catId === id ? {...dx, catId: ''} : dx);
+  saveData(d);
+  renderCatManager();
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── SERVICE WORKER (offline PWA) ───────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  const swCode = `
+const CACHE = 'medref-v1';
+const ASSETS = [location.href];
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys =>
+    Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))
+  ));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(r => r || fetch(e.request).catch(() =>
+      caches.match(e.request)
+    ))
+  );
+});`;
+
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+</script>
+</body>
+</html>
