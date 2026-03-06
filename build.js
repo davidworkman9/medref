@@ -32,6 +32,7 @@ const categories = [...catSet.values()];
 const dxData = diagnoses.map((d, i) => ({
   id: 'dx' + (i + 1),
   name: d.name,
+  description: d.description || '',
   icd: d.icd,
   catId: catSet.get(d.cat).id,
   color: d.color,
@@ -269,7 +270,7 @@ let activeModel = null; // which model is currently loaded
 let pipelineModule = null; // cached transformers.js module
 
 function dxSearchText(dx) {
-  return [dx.name, dx.icd, dx.signs, dx.ddx, dx.treatment, dx.meds, dx.labs, dx.notes].filter(Boolean).join(' ');
+  return [dx.name, dx.description, dx.icd, dx.signs, dx.ddx, dx.treatment, dx.meds, dx.labs, dx.notes].filter(Boolean).join(' ');
 }
 
 function cosineSim(a, b) {
@@ -589,6 +590,9 @@ function openDetail(id) {
   if (dx.icd) metaHTML += '<span class="dx-icd" style="font-size:13px;">' + escHtml(dx.icd) + '</span>';
   if (cat) metaHTML += '<span class="dx-cat-badge" style="background:' + cat.color + '22;color:' + cat.color + ';font-size:13px;">' + escHtml(cat.name) + '</span>';
   let bodyHTML = '<div class="detail-meta-row">' + metaHTML + '</div>';
+  if (dx.description) {
+    bodyHTML += '<div style="color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:20px;padding:14px;background:var(--surface);border-radius:var(--radius);border:1.5px solid var(--border);">' + escHtml(dx.description) + '</div>';
+  }
   [{key:'signs',text:dx.signs},{key:'treatment',text:dx.treatment},{key:'meds',text:dx.meds},{key:'labs',text:dx.labs},{key:'notes',text:dx.notes}].forEach(({key,text}) => {
     if (!text) return;
     const sec = SECTION_COLORS[key];
@@ -635,6 +639,7 @@ function openModal(editId) {
     if (dx) {
       document.getElementById('modal-title').textContent = 'Edit Diagnosis';
       document.getElementById('f-name').value = dx.name || '';
+      document.getElementById('f-desc').value = dx.description || '';
       document.getElementById('f-icd').value = dx.icd || '';
       document.getElementById('f-cat').value = dx.catId || '';
       document.getElementById('f-signs').value = dx.signs || '';
@@ -647,7 +652,7 @@ function openModal(editId) {
     }
   } else {
     document.getElementById('modal-title').textContent = 'New Diagnosis';
-    ['f-name','f-icd','f-signs','f-treatment','f-meds','f-ddx','f-labs','f-notes'].forEach(id => document.getElementById(id).value = '');
+    ['f-name','f-desc','f-icd','f-signs','f-treatment','f-meds','f-ddx','f-labs','f-notes'].forEach(id => document.getElementById(id).value = '');
     sel.value = '';
     state.selectedColor = COLORS[0];
   }
@@ -666,6 +671,7 @@ async function saveDx() {
   const record = {
     id: state.editingId || uid(),
     name,
+    description: document.getElementById('f-desc').value.trim(),
     icd: document.getElementById('f-icd').value.trim(),
     catId: document.getElementById('f-cat').value,
     color: state.selectedColor,
