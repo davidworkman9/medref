@@ -48,6 +48,19 @@
   #ai-badge.loading { background: var(--accent6); color: var(--bg); }
   #ai-badge.ready { background: var(--accent4); color: var(--bg); }
   #ai-badge.off { display: none; }
+  #search-mode { display: flex; gap: 6px; margin-top: 8px; }
+  .mode-btn { padding: 4px 12px; border-radius: 50px; border: 1.5px solid var(--border); background: transparent; color: var(--muted); font-size: 12px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s; }
+  .mode-btn.active { background: var(--accent2); border-color: var(--accent2); color: var(--bg); }
+  .mode-btn:active { opacity: 0.7; }
+  .mode-btn .mode-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+  .mode-btn .mode-dot.green { background: var(--accent4); }
+  .mode-btn .mode-dot.yellow { background: var(--accent6); }
+  .mode-btn .mode-dot.off { background: var(--muted); }
+  #mode-info-btn { background: none; border: 1.5px solid var(--border); border-radius: 50%; width: 22px; height: 22px; color: var(--muted); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', serif; margin-left: auto; }
+  #mode-info-btn:active { opacity: 0.7; }
+  #mode-info { display: none; background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-top: 8px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+  #mode-info.open { display: block; }
+  #mode-info-title { font-weight: 700; color: var(--text); margin-bottom: 4px; }
   #tabs { display: flex; padding: 10px 16px 0; gap: 8px; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; background: var(--bg); border-bottom: 1px solid var(--border); }
   #tabs::-webkit-scrollbar { display: none; }
   .tab { padding: 8px 16px; border-radius: 10px 10px 0 0; border: none; background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; border-bottom: 3px solid transparent; padding-bottom: 10px; }
@@ -151,6 +164,13 @@
       <input id="search" type="search" placeholder="Search diagnoses..." autocomplete="off" autocorrect="off" spellcheck="false">
       <span id="ai-badge" class="off"></span>
     </div>
+    <div id="search-mode">
+      <button class="mode-btn active" data-mode="smart" onclick="setSearchMode('smart')">Smart</button>
+      <button class="mode-btn" data-mode="ai" onclick="setSearchMode('ai')">AI<span id="ai-dot-general" class="mode-dot off" style="margin-left:4px;"></span></button>
+      <button class="mode-btn" data-mode="ai-med" onclick="setSearchMode('ai-med')">AI Med<span id="ai-dot-med" class="mode-dot off" style="margin-left:4px;"></span></button>
+      <button id="mode-info-btn" onclick="toggleModeInfo()">?</button>
+    </div>
+    <div id="mode-info"><div id="mode-info-title"></div><div id="mode-info-desc"></div></div>
   </div>
   <div id="tabs">
     <button class="tab active" data-tab="browse" onclick="switchTab('browse')">Browse A–Z</button>

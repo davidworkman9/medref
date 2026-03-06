@@ -60,6 +60,83 @@ const SECTION_COLORS = {
   notes:     { bg: 'rgba(234,179,8,0.15)',   icon: '📌', label: 'Clinical Pearls' },
 };
 
+// ─── MEDICAL SYNONYM DICTIONARY ───
+const MED_SYNONYMS = {
+  'heart attack':['myocardial infarction','MI','STEMI','NSTEMI','acute coronary syndrome','troponin'],
+  'stroke':['cerebrovascular accident','CVA','ischemic stroke','hemorrhagic stroke','TIA','hemiparesis','aphasia'],
+  'blood clot':['thrombosis','DVT','deep vein thrombosis','PE','pulmonary embolism','thrombus','VTE'],
+  'chest pain':['angina','ACS','acute coronary','pericarditis','pleuritic','substernal'],
+  'shortness of breath':['dyspnea','SOB','respiratory distress','tachypnea','orthopnea','breathless'],
+  'trouble breathing':['dyspnea','respiratory distress','tachypnea','respiratory failure','airway'],
+  'cant breathe':['dyspnea','respiratory failure','respiratory distress','airway obstruction'],
+  'high blood pressure':['hypertension','HTN','hypertensive','elevated BP','blood pressure'],
+  'low blood pressure':['hypotension','shock','hemodynamic instability','MAP'],
+  'high sugar':['hyperglycemia','diabetes','DKA','diabetic ketoacidosis','HHS','glucose'],
+  'low sugar':['hypoglycemia','insulin','glucose','dextrose','D50'],
+  'infection':['sepsis','bacteremia','abscess','cellulitis','pneumonia','UTI','meningitis'],
+  'fever':['febrile','pyrexia','temperature','hyperthermia','chills','rigors'],
+  'swelling':['edema','oedema','anasarca','lymphedema','angioedema','fluid overload'],
+  'bleeding':['hemorrhage','hemorrhagic','hematemesis','melena','hematochezia','hematuria','GI bleed','coagulopathy'],
+  'throwing up':['vomiting','emesis','nausea','retching','hematemesis'],
+  'dizzy':['dizziness','vertigo','lightheaded','presyncope','syncope','disequilibrium'],
+  'fainting':['syncope','loss of consciousness','presyncope','vasovagal','LOC'],
+  'headache':['cephalalgia','migraine','tension headache','thunderclap','SAH','meningitis','ICP'],
+  'seizure':['epilepsy','convulsion','status epilepticus','tonic-clonic','focal seizure'],
+  'confusion':['altered mental status','AMS','delirium','encephalopathy','obtunded','disoriented'],
+  'rash':['dermatitis','urticaria','exanthem','maculopapular','petechiae','purpura','erythema'],
+  'allergic reaction':['anaphylaxis','angioedema','urticaria','hypersensitivity','epinephrine'],
+  'kidney failure':['acute kidney injury','AKI','renal failure','CKD','uremia','dialysis','creatinine'],
+  'liver failure':['hepatic failure','cirrhosis','hepatitis','jaundice','coagulopathy','encephalopathy'],
+  'broken bone':['fracture','fx','orthopedic','ORIF','displacement','comminuted'],
+  'breathing fast':['tachypnea','hyperventilation','respiratory alkalosis','Kussmaul'],
+  'heart racing':['tachycardia','palpitations','SVT','atrial fibrillation','VT','arrhythmia'],
+  'slow heart':['bradycardia','heart block','AV block','sick sinus','pacemaker'],
+  'belly pain':['abdominal pain','epigastric','RUQ','LLQ','RLQ','peritonitis','acute abdomen'],
+  'stomach pain':['abdominal pain','epigastric','gastritis','PUD','peptic ulcer','dyspepsia'],
+  'back pain':['lumbago','sciatica','spinal','vertebral','disc herniation','cord compression','cauda equina'],
+  'cough':['productive cough','hemoptysis','nonproductive','bronchitis','pneumonia','TB'],
+  'coughing blood':['hemoptysis','pulmonary hemorrhage','TB','PE','lung cancer','bronchiectasis'],
+  'peeing blood':['hematuria','urinary','bladder','kidney stone','UTI','nephrolithiasis'],
+  'yellow skin':['jaundice','icterus','bilirubin','hepatitis','cholestasis','liver failure'],
+  'sweating':['diaphoresis','hyperhidrosis','night sweats','autonomic'],
+  'weak':['weakness','fatigue','malaise','lethargy','asthenia','myopathy','paresis'],
+  'numb':['numbness','paresthesia','neuropathy','sensory deficit','tingling'],
+  'tingling':['paresthesia','neuropathy','numbness','radiculopathy','carpal tunnel'],
+  'swollen legs':['peripheral edema','DVT','CHF','venous insufficiency','lymphedema','anasarca'],
+  'red eye':['conjunctivitis','uveitis','keratitis','glaucoma','subconjunctival hemorrhage','scleritis'],
+  'sore throat':['pharyngitis','tonsillar','peritonsillar abscess','strep','epiglottitis'],
+  'difficulty swallowing':['dysphagia','odynophagia','esophageal','achalasia','stricture'],
+  'weight loss':['cachexia','wasting','malnutrition','anorexia','malignancy','TB','HIV'],
+  'dehydration':['volume depletion','hypovolemia','dry mucous membranes','tachycardia','orthostatic'],
+  'drug overdose':['toxicity','ingestion','overdose','poisoning','acetaminophen','salicylate'],
+  'alcohol':['ethanol','alcohol withdrawal','delirium tremens','DTs','cirrhosis','Wernicke'],
+  'pregnant':['pregnancy','obstetric','pre-eclampsia','eclampsia','HELLP','gestational'],
+  'cant move':['paralysis','plegia','paresis','weakness','spinal cord','stroke','GBS'],
+  'wheezing':['bronchospasm','asthma','COPD','reactive airway','stridor'],
+  'blue skin':['cyanosis','hypoxemia','hypoxia','methemoglobinemia','desaturation'],
+  'cold hands':['Raynaud','peripheral vascular','ischemia','vasoconstriction','acrocyanosis'],
+  'blood in stool':['hematochezia','melena','GI bleed','hemorrhoid','diverticular','colorectal'],
+  'diarrhea':['loose stools','watery stool','C diff','infectious colitis','IBD','malabsorption'],
+  'constipation':['obstipation','ileus','SBO','bowel obstruction','impaction'],
+  'chest tightness':['angina','bronchospasm','asthma','ACS','pleurisy','anxiety'],
+  'trauma':['injury','laceration','contusion','fracture','hemorrhage','MVA','fall'],
+  'burn':['thermal injury','chemical burn','inhalation injury','BSA','fluid resuscitation'],
+  'stiff neck':['nuchal rigidity','meningismus','meningitis','SAH','cervical'],
+  'muscle pain':['myalgia','rhabdomyolysis','myositis','fibromyalgia','CK'],
+  'joint pain':['arthralgia','arthritis','gout','septic joint','inflammatory','synovitis'],
+  'swollen joint':['arthritis','effusion','septic arthritis','gout','pseudogout','synovitis'],
+  'eye pain':['orbital pain','uveitis','glaucoma','optic neuritis','scleritis','keratitis'],
+  'double vision':['diplopia','cranial nerve palsy','myasthenia gravis','stroke','orbital'],
+  'cant pee':['urinary retention','AUR','obstruction','BPH','neurogenic bladder','catheter'],
+  'blood thinners':['anticoagulation','warfarin','heparin','DOAC','INR','bleeding risk'],
+  'fast breathing':['tachypnea','hyperventilation','respiratory distress','acidosis'],
+  'high potassium':['hyperkalemia','potassium','K+','arrhythmia','ECG changes','peaked T'],
+  'low potassium':['hypokalemia','potassium','K+','weakness','arrhythmia','U wave'],
+  'low sodium':['hyponatremia','sodium','Na+','SIADH','seizures','osmolality'],
+  'clot':['thrombosis','embolism','DVT','PE','coagulation','anticoagulation'],
+  'septic':['sepsis','bacteremia','SIRS','septic shock','vasopressors','lactate'],
+};
+
 // ─── PERSISTENCE (localStorage + IndexedDB for embeddings) ───
 function loadData() {
   try { return JSON.parse(localStorage.getItem('medref_data') || '{}'); } catch { return {}; }
@@ -93,16 +170,19 @@ function getData() {
 
 // ─── IndexedDB for embeddings ───
 const DB_NAME = 'medref_embeddings';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 let embeddingDB = null;
+const STORES = ['embeddings_general', 'embeddings_med'];
 
 function openEmbeddingDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
-      if (!db.objectStoreNames.contains('embeddings')) {
-        db.createObjectStore('embeddings', { keyPath: 'id' });
+      STORES.forEach(s => { if (!db.objectStoreNames.contains(s)) db.createObjectStore(s, { keyPath: 'id' }); });
+      // migrate old store
+      if (db.objectStoreNames.contains('embeddings') && !e.oldVersion) {
+        // skip, fresh install
       }
     };
     req.onsuccess = (e) => { embeddingDB = e.target.result; resolve(embeddingDB); };
@@ -110,37 +190,83 @@ function openEmbeddingDB() {
   });
 }
 
-function getEmbedding(id) {
-  return new Promise((resolve, reject) => {
-    const tx = embeddingDB.transaction('embeddings', 'readonly');
-    const req = tx.objectStore('embeddings').get(id);
-    req.onsuccess = () => resolve(req.result ? req.result.embedding : null);
-    req.onerror = () => resolve(null);
-  });
-}
-
-function putEmbedding(id, embedding) {
-  return new Promise((resolve, reject) => {
-    const tx = embeddingDB.transaction('embeddings', 'readwrite');
-    tx.objectStore('embeddings').put({ id, embedding: Array.from(embedding) });
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => resolve();
-  });
-}
-
-function getAllEmbeddings() {
+function putEmbedding(storeName, id, embedding) {
   return new Promise((resolve) => {
-    const tx = embeddingDB.transaction('embeddings', 'readonly');
-    const req = tx.objectStore('embeddings').getAll();
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = () => resolve([]);
+    try {
+      const tx = embeddingDB.transaction(storeName, 'readwrite');
+      tx.objectStore(storeName).put({ id, embedding: Array.from(embedding) });
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    } catch { resolve(); }
   });
+}
+
+function getAllEmbeddings(storeName) {
+  return new Promise((resolve) => {
+    try {
+      const tx = embeddingDB.transaction(storeName, 'readonly');
+      const req = tx.objectStore(storeName).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    } catch { resolve([]); }
+  });
+}
+
+// ─── SYNONYM SEARCH ───
+function expandQuery(query) {
+  const q = query.toLowerCase();
+  const expanded = new Set(q.split(/\\s+/));
+  for (const [lay, terms] of Object.entries(MED_SYNONYMS)) {
+    // Check if query contains the lay term
+    if (q.includes(lay)) {
+      terms.forEach(t => t.split(/\\s+/).forEach(w => expanded.add(w.toLowerCase())));
+    }
+    // Check if query contains any of the medical terms
+    for (const term of terms) {
+      if (q.includes(term.toLowerCase())) {
+        lay.split(/\\s+/).forEach(w => expanded.add(w.toLowerCase()));
+        terms.forEach(t => t.split(/\\s+/).forEach(w => expanded.add(w.toLowerCase())));
+        break;
+      }
+    }
+  }
+  return [...expanded];
+}
+
+function smartSearch(query, diagnoses) {
+  const terms = expandQuery(query);
+  const scored = diagnoses.map(dx => {
+    const text = dxSearchText(dx).toLowerCase();
+    let hits = 0;
+    let totalTerms = terms.length;
+    for (const term of terms) {
+      if (text.includes(term)) hits++;
+    }
+    const score = totalTerms > 0 ? hits / totalTerms : 0;
+    return { dx, score };
+  });
+  scored.sort((a, b) => b.score - a.score);
+  return scored.filter(s => s.score > 0);
 }
 
 // ─── SEMANTIC SEARCH ENGINE ───
-let semanticReady = false;
-let extractor = null;
-let embeddingCache = new Map(); // id -> Float32Array
+const MODELS = {
+  'ai': { name: 'Xenova/all-MiniLM-L6-v2', label: 'MiniLM' },
+  'ai-med': { name: 'Xenova/SapBERT-from-PubMedBERT-fulltext', label: 'SapBERT' },
+};
+
+const MODE_INFO = {
+  'smart': { title: 'Smart Search', desc: 'Instant text matching with medical synonym expansion. Translates common terms (e.g. "heart attack") to their clinical equivalents (myocardial infarction, STEMI, troponin) and searches across all fields. No download required.' },
+  'ai': { title: 'AI Search (MiniLM)', desc: 'General-purpose sentence similarity model (~25MB download, cached after first use). Understands natural language queries and finds semantically related diagnoses even without exact keyword matches. Good for general medical questions.' },
+  'ai-med': { title: 'AI Med Search (SapBERT)', desc: 'Medical-domain model trained on UMLS medical ontology via PubMedBERT (~100MB download, cached after first use). Understands clinical terminology, maps symptoms to conditions, and links medical concepts. Best for clinical queries.' },
+};
+
+let modelState = {
+  'ai': { ready: false, extractor: null, embeddings: new Map(), dbStore: 'embeddings_general' },
+  'ai-med': { ready: false, extractor: null, embeddings: new Map(), dbStore: 'embeddings_med' },
+};
+let activeModel = null; // which model is currently loaded
+let pipelineModule = null; // cached transformers.js module
 
 function dxSearchText(dx) {
   return [dx.name, dx.icd, dx.signs, dx.ddx, dx.treatment, dx.meds, dx.labs, dx.notes].filter(Boolean).join(' ');
@@ -156,63 +282,90 @@ function cosineSim(a, b) {
   return dot / (Math.sqrt(na) * Math.sqrt(nb) + 1e-8);
 }
 
-async function initSemanticSearch() {
+async function loadTransformers() {
+  if (!pipelineModule) {
+    const mod = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.1');
+    pipelineModule = mod.pipeline;
+  }
+  return pipelineModule;
+}
+
+function updateModelDot(mode, status) {
+  const dotId = mode === 'ai' ? 'ai-dot-general' : 'ai-dot-med';
+  const dot = document.getElementById(dotId);
+  if (!dot) return;
+  dot.className = 'mode-dot ' + (status === 'ready' ? 'green' : status === 'loading' ? 'yellow' : 'off');
+}
+
+async function initModel(mode) {
+  const ms = modelState[mode];
+  if (ms.ready) return;
+
+  const modelName = MODELS[mode].name;
+  updateModelDot(mode, 'loading');
+
+  // Update badge
   const badge = document.getElementById('ai-badge');
   badge.className = 'loading';
-  badge.textContent = 'AI loading...';
+  badge.textContent = MODELS[mode].label + ' loading...';
 
   try {
-    const { pipeline } = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.1');
-    extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', {
-      dtype: 'q8',
-    });
+    const pipeline = await loadTransformers();
+    ms.extractor = await pipeline('feature-extraction', modelName, { dtype: 'q8' });
 
-    badge.className = 'ready';
-    badge.textContent = 'AI';
+    // Load cached embeddings
+    const stored = await getAllEmbeddings(ms.dbStore);
+    stored.forEach(e => { ms.embeddings.set(e.id, new Float32Array(e.embedding)); });
 
-    // Load cached embeddings from IndexedDB
-    const stored = await getAllEmbeddings();
-    stored.forEach(e => { embeddingCache.set(e.id, new Float32Array(e.embedding)); });
-
-    // Embed any diagnoses that don't have embeddings yet
+    // Embed missing diagnoses
     const d = getData();
     let newCount = 0;
+    const total = d.diagnoses.length;
     for (const dx of d.diagnoses) {
-      if (!embeddingCache.has(dx.id)) {
+      if (!ms.embeddings.has(dx.id)) {
         const text = dxSearchText(dx);
-        const output = await extractor(text, { pooling: 'mean', normalize: true });
+        const output = await ms.extractor(text, { pooling: 'mean', normalize: true });
         const emb = new Float32Array(output.data);
-        embeddingCache.set(dx.id, emb);
-        await putEmbedding(dx.id, emb);
+        ms.embeddings.set(dx.id, emb);
+        await putEmbedding(ms.dbStore, dx.id, emb);
         newCount++;
-        if (newCount % 10 === 0) {
-          badge.textContent = 'AI ' + Math.round((newCount / d.diagnoses.length) * 100) + '%';
+        if (newCount % 5 === 0) {
+          badge.textContent = MODELS[mode].label + ' ' + Math.round(((total - (total - newCount)) / total) * 100) + '%';
         }
       }
     }
 
-    semanticReady = true;
-    badge.textContent = 'AI ✓';
-    setTimeout(() => { badge.textContent = 'AI'; }, 2000);
+    ms.ready = true;
+    updateModelDot(mode, 'ready');
+    badge.className = 'ready';
+    badge.textContent = MODELS[mode].label + ' ✓';
+    setTimeout(() => {
+      if (state.searchMode === mode) {
+        badge.textContent = MODELS[mode].label;
+      } else {
+        badge.className = 'off';
+      }
+    }, 2000);
 
-    // If there's a pending search and detail view is not open, re-run it
-    if (state.search && !state.viewingId) renderList();
+    if (state.search && state.searchMode === mode && !state.viewingId) renderList();
 
   } catch (err) {
-    console.error('Semantic search failed to load:', err);
+    console.error(MODELS[mode].label + ' failed to load:', err);
+    updateModelDot(mode, 'off');
     badge.className = 'off';
     badge.textContent = '';
   }
 }
 
-async function semanticSearch(query, diagnoses) {
-  if (!semanticReady || !extractor) return null;
+async function semanticSearch(mode, query, diagnoses) {
+  const ms = modelState[mode];
+  if (!ms.ready || !ms.extractor) return null;
   try {
-    const output = await extractor(query, { pooling: 'mean', normalize: true });
+    const output = await ms.extractor(query, { pooling: 'mean', normalize: true });
     const queryEmb = new Float32Array(output.data);
 
     const scored = diagnoses.map(dx => {
-      const emb = embeddingCache.get(dx.id);
+      const emb = ms.embeddings.get(dx.id);
       if (!emb) return { dx, score: 0 };
       return { dx, score: cosineSim(queryEmb, emb) };
     });
@@ -224,11 +377,62 @@ async function semanticSearch(query, diagnoses) {
   }
 }
 
+function setSearchMode(mode) {
+  state.searchMode = mode;
+  state.semanticResults = null;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+
+  const badge = document.getElementById('ai-badge');
+  if (mode === 'smart') {
+    badge.className = 'off';
+  } else {
+    const ms = modelState[mode];
+    if (ms.ready) {
+      badge.className = 'ready';
+      badge.textContent = MODELS[mode].label;
+    } else {
+      badge.className = 'off';
+      initModel(mode); // start loading
+    }
+  }
+
+  // Update info panel if open
+  const infoPanel = document.getElementById('mode-info');
+  if (infoPanel.classList.contains('open')) {
+    showModeInfo(mode);
+  }
+
+  // Re-run search with new mode
+  if (state.search) {
+    triggerSearch();
+  } else {
+    renderList();
+  }
+}
+
+function toggleModeInfo() {
+  const panel = document.getElementById('mode-info');
+  if (panel.classList.contains('open')) {
+    panel.classList.remove('open');
+  } else {
+    showModeInfo(state.searchMode);
+    panel.classList.add('open');
+  }
+}
+
+function showModeInfo(mode) {
+  const info = MODE_INFO[mode];
+  if (!info) return;
+  document.getElementById('mode-info-title').textContent = info.title;
+  document.getElementById('mode-info-desc').textContent = info.desc;
+}
+
 // ─── STATE ───
 let state = {
   tab: 'browse',
   catFilter: 'all',
   search: '',
+  searchMode: 'smart', // 'smart', 'ai', 'ai-med'
   editingId: null,
   selectedColor: COLORS[0],
   catPickColor: COLORS[0],
@@ -251,10 +455,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('install-banner').classList.add('hidden');
   }
 
-  // Init IndexedDB then semantic search
+  // Init IndexedDB
   try {
     await openEmbeddingDB();
-    initSemanticSearch(); // fire and forget
   } catch (e) {
     console.error('IndexedDB error:', e);
   }
@@ -295,27 +498,11 @@ function renderList() {
 
   // filter by search
   if (state.search) {
-    const q = state.search.toLowerCase();
-
-    // If we have semantic results, use them
     if (state.semanticResults && state.semanticResults.length > 0) {
-      const resultIds = new Set(state.semanticResults.map(r => r.dx.id));
-      // Also include substring matches
-      const substringMatches = diagnoses.filter(dx =>
-        !resultIds.has(dx.id) && (
-          dx.name.toLowerCase().includes(q) ||
-          (dx.icd||'').toLowerCase().includes(q) ||
-          (dx.signs||'').toLowerCase().includes(q) ||
-          (dx.ddx||'').toLowerCase().includes(q) ||
-          (dx.meds||'').toLowerCase().includes(q) ||
-          (dx.notes||'').toLowerCase().includes(q)
-        )
-      ).map(dx => ({ dx, score: 0.1 }));
-
-      const combined = [...state.semanticResults, ...substringMatches];
-      diagnoses = combined.map(r => ({...r.dx, _score: r.score}));
+      diagnoses = state.semanticResults.map(r => ({...r.dx, _score: r.score}));
     } else {
-      // Fallback to substring search
+      // Basic substring fallback
+      const q = state.search.toLowerCase();
       diagnoses = diagnoses.filter(dx =>
         dx.name.toLowerCase().includes(q) ||
         (dx.icd||'').toLowerCase().includes(q) ||
@@ -373,7 +560,7 @@ function renderList() {
 function dxCardHTML(dx, d, score) {
   const cat = (d.categories || []).find(c => c.id === dx.catId);
   const color = dx.color || '#06b6d4';
-  const scoreHTML = score && score > 0.15 ? '<span class="dx-score">' + Math.round(score * 100) + '% match</span>' : '';
+  const scoreHTML = score && score > 0.05 ? '<span class="dx-score">' + Math.round(score * 100) + '%</span>' : '';
   return '<div class="dx-card" onclick="openDetail(\\'' + dx.id + '\\')">' +
     '<div class="dx-card-header">' +
     '<div class="dx-color-bar" style="background:' + color + '"></div>' +
@@ -498,15 +685,17 @@ async function saveDx() {
   }
   saveData(d);
 
-  // Generate embedding for new/edited diagnosis
-  if (semanticReady && extractor) {
-    try {
-      const text = dxSearchText(record);
-      const output = await extractor(text, { pooling: 'mean', normalize: true });
-      const emb = new Float32Array(output.data);
-      embeddingCache.set(record.id, emb);
-      await putEmbedding(record.id, emb);
-    } catch {}
+  // Generate embeddings for new/edited diagnosis in all loaded models
+  for (const [mode, ms] of Object.entries(modelState)) {
+    if (ms.ready && ms.extractor) {
+      try {
+        const text = dxSearchText(record);
+        const output = await ms.extractor(text, { pooling: 'mean', normalize: true });
+        const emb = new Float32Array(output.data);
+        ms.embeddings.set(record.id, emb);
+        await putEmbedding(ms.dbStore, record.id, emb);
+      } catch {}
+    }
   }
 
   closeModal();
@@ -554,27 +743,46 @@ function switchTab(tab) {
 function setCatFilter(id) { state.catFilter = id; renderCategoryBar(); renderList(); }
 
 // ─── SEARCH ───
-function setupSearch() {
-  const input = document.getElementById('search');
-  input.addEventListener('input', (e) => {
-    state.search = e.target.value.trim();
+function triggerSearch() {
+  state.semanticResults = null;
+  const d = getData();
 
-    // Always do immediate substring render
-    state.semanticResults = null;
+  if (state.searchMode === 'smart') {
+    // Immediate synonym-expanded search
+    if (state.search) {
+      state.semanticResults = smartSearch(state.search, d.diagnoses);
+    }
+    renderList();
+  } else {
+    // AI mode: immediate smart fallback, then async semantic
+    if (state.search) {
+      state.semanticResults = smartSearch(state.search, d.diagnoses);
+    }
     renderList();
 
-    // Debounce semantic search
     clearTimeout(state.searchTimeout);
-    if (state.search && semanticReady) {
+    const mode = state.searchMode;
+    const ms = modelState[mode];
+    if (state.search && ms.ready) {
       state.searchTimeout = setTimeout(async () => {
-        const d = getData();
-        const results = await semanticSearch(state.search, d.diagnoses);
-        if (results && state.search === e.target.value.trim() && !state.viewingId) {
-          state.semanticResults = results;
+        const results = await semanticSearch(mode, state.search, d.diagnoses);
+        if (results && state.search && !state.viewingId && state.searchMode === mode) {
+          // Merge: AI results first, then smart results not already included
+          const aiIds = new Set(results.map(r => r.dx.id));
+          const smartFallback = smartSearch(state.search, d.diagnoses).filter(r => !aiIds.has(r.dx.id)).map(r => ({...r, score: Math.min(r.score, 0.14)}));
+          state.semanticResults = [...results, ...smartFallback];
           renderList();
         }
       }, 300);
     }
+  }
+}
+
+function setupSearch() {
+  const input = document.getElementById('search');
+  input.addEventListener('input', (e) => {
+    state.search = e.target.value.trim();
+    triggerSearch();
   });
 }
 
