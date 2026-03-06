@@ -14,7 +14,10 @@ async function computeEmbeddings(modelName, label) {
   const embeddings = {};
   for (let i = 0; i < diagnoses.length; i++) {
     const dx = diagnoses[i];
-    const text = dxSearchText(dx);
+    // Truncate text to ~250 words to stay within 512 token limit for SapBERT
+    const fullText = dxSearchText(dx);
+    const words = fullText.split(/\s+/);
+    const text = words.length > 250 ? words.slice(0, 250).join(' ') : fullText;
     const output = await extractor(text, { pooling: 'mean', normalize: true });
     embeddings['dx' + (i + 1)] = Array.from(output.data);
 
